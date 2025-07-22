@@ -210,8 +210,11 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     if (!intentValue) {
       setRaiseIntentError('Enter intent name');
     } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
-    } else {
+      const nothingContext = { type: 'fdc3.nothing' as ContextType };
+      setRaiseIntentContext(nothingContext);
+    }
+    
+    if (intentValue && (raiseIntentContext || !raiseIntentContext)) {
       if (targetApp && targetApp != 'None') {
         try {
           const targetObj = JSON.parse(targetApp);

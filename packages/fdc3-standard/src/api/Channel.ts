@@ -54,6 +54,12 @@ export interface Channel {
   broadcast(context: Context): Promise<void>;
 
   /**
+   * Clears the current context on the channel by broadcasting a null context.
+   * This effectively removes any existing context from the channel.
+   */
+  clearContext(): Promise<void>;
+
+  /**
    * When a `contextType`_` is provided, the most recent context matching the type will be returned, or `null` if no matching context is found.
    *
    * If no `contextType` is provided, the most recent context that was broadcast on the channel - regardless of type - will be returned.  If no context has been set on the channel, it will return `null`.

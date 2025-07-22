@@ -505,6 +505,12 @@ export interface DesktopAgent {
   leaveCurrentChannel(): Promise<void>;
 
   /**
+   * Clears the current context on the current user channel by broadcasting a null context.
+   * If the app is not joined to a channel, this is a no-op.
+   */
+  clearContext(): Promise<void>;
+
+  /**
    * Retrieves information about the FDC3 Desktop Agent implementation, including the supported version
    * of the FDC3 specification, the name of the provider of the implementation, its own version number
    * and the metadata of the calling application according to the desktop agent.
