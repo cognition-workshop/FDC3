@@ -208,9 +208,11 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
     if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
+      setRaiseIntentError('Please enter an intent name to proceed');
     } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+      setRaiseIntentError(
+        'Please select a context. Use "fdc3.nothing" if the intent does not require specific context data'
+      );
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -316,9 +318,11 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
   const handleTargetMenuOpen = () => {
     const fetchAppsAndInstances = async () => {
       if (!intentValue) {
-        setRaiseIntentError('Enter intent name');
+        setRaiseIntentError('Please enter an intent name to proceed');
       } else if (!raiseIntentContext) {
-        setRaiseIntentError('Select a context first');
+        setRaiseIntentError(
+          'Please select a context. Use "fdc3.nothing" if the intent does not require specific context data'
+        );
       } else {
         const intentTargetOptions: IntentTargetOption[] = await getTargetOptions(
           intentValue.value,
@@ -586,6 +590,9 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
           <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
             <Grid item className={classes.field}>
               <ContextTemplates handleTabChange={handleTabChange} contextStateSetter={setRaiseIntentContext} />
+              <Typography variant="caption" className={classes.caption}>
+                Select a context for the intent. Use "fdc3.nothing" if the intent doesn't require specific context data.
+              </Typography>
               <Autocomplete
                 className={classes.rightPadding}
                 id="raise-intent"
@@ -713,6 +720,9 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 handleTabChange={handleTabChange}
                 contextStateSetter={setRaiseIntentWithContextContext}
               />
+              <Typography variant="caption" className={classes.caption}>
+                Select a context for the intent. Use "fdc3.nothing" if the intent doesn't require specific context data.
+              </Typography>
               <Grid className={classes.rightPadding}>
                 <FormGroup>
                   <FormControlLabel

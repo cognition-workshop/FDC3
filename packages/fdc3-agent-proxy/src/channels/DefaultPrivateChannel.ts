@@ -26,7 +26,7 @@ export class DefaultPrivateChannel extends DefaultChannel implements PrivateChan
     super(messaging, messageExchangeTimeout, id, 'private');
   }
 
-  async addEventListener(type: PrivateChannelEventTypes | null, handler: EventHandler): Promise<Listener> {
+  addEventListener = async (type: PrivateChannelEventTypes | null, handler: EventHandler): Promise<Listener> => {
     let a: RegisterableListener;
     switch (type) {
       case 'addContextListener':
@@ -46,7 +46,7 @@ export class DefaultPrivateChannel extends DefaultChannel implements PrivateChan
     }
     await a.register();
     return a;
-  }
+  };
 
   //implementations of the deprecated listener functions
   onAddContextListener(handler: (contextType?: string) => void): Listener {
@@ -94,7 +94,7 @@ export class DefaultPrivateChannel extends DefaultChannel implements PrivateChan
     return l;
   }
 
-  async disconnect(): Promise<void> {
+  disconnect = async (): Promise<void> => {
     const msg: PrivateChannelDisconnectRequest = {
       meta: this.messaging.createMeta(),
       payload: {
@@ -107,9 +107,9 @@ export class DefaultPrivateChannel extends DefaultChannel implements PrivateChan
       'privateChannelDisconnectResponse',
       this.messageExchangeTimeout
     );
-  }
+  };
 
-  async addContextListenerInner(contextType: string | null, theHandler: ContextHandler): Promise<Listener> {
+  addContextListenerInner = async (contextType: string | null, theHandler: ContextHandler): Promise<Listener> => {
     const listener = new DefaultContextListener(
       this.messaging,
       this.messageExchangeTimeout,
@@ -119,5 +119,5 @@ export class DefaultPrivateChannel extends DefaultChannel implements PrivateChan
     );
     await listener.register();
     return listener;
-  }
+  };
 }

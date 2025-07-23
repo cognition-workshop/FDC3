@@ -30,7 +30,7 @@ export class DefaultChannel implements Channel {
     this.displayMetadata = displayMetadata;
   }
 
-  async broadcast(context: Context): Promise<void> {
+  broadcast = async (context: Context): Promise<void> => {
     const request: BroadcastRequest = {
       meta: this.messaging.createMeta(),
       payload: {
@@ -40,9 +40,9 @@ export class DefaultChannel implements Channel {
       type: 'broadcastRequest',
     };
     await this.messaging.exchange<BroadcastResponse>(request, 'broadcastResponse', this.messageExchangeTimeout);
-  }
+  };
 
-  async getCurrentContext(contextType?: string | undefined): Promise<Context | null> {
+  getCurrentContext = async (contextType?: string | undefined): Promise<Context | null> => {
     // first, ensure channel state is up-to-date
     const request: GetCurrentContextRequest = {
       meta: this.messaging.createMeta(),
@@ -59,12 +59,12 @@ export class DefaultChannel implements Channel {
     );
 
     return response.payload.context ?? null;
-  }
+  };
 
-  async addContextListener(
+  addContextListener = async (
     contextTypeOrHandler: string | null | ContextHandler,
     handler?: ContextHandler
-  ): Promise<Listener> {
+  ): Promise<Listener> => {
     let theContextType: string | null;
     let theHandler: ContextHandler;
 
@@ -85,9 +85,9 @@ export class DefaultChannel implements Channel {
     }
 
     return await this.addContextListenerInner(theContextType, theHandler);
-  }
+  };
 
-  async addContextListenerInner(contextType: string | null, theHandler: ContextHandler): Promise<Listener> {
+  addContextListenerInner = async (contextType: string | null, theHandler: ContextHandler): Promise<Listener> => {
     const listener = new DefaultContextListener(
       this.messaging,
       this.messageExchangeTimeout,
@@ -97,5 +97,5 @@ export class DefaultChannel implements Channel {
     );
     await listener.register();
     return listener;
-  }
+  };
 }
