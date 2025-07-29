@@ -190,6 +190,8 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
   const [intentForContextResolution, setIntentForContextResolution] = useState<IntentResolution | undefined | null>(
     null
   );
+  const [isRaisingIntent, setIsRaisingIntent] = useState<boolean>(false);
+  const [isRaisingIntentForContext, setIsRaisingIntentForContext] = useState<boolean>(false);
   const intentListenersOptions: ListenerOptionType[] = intentStore.intentsList;
   const [contextFields, setContextFields] = useState<any[]>([]);
   const [resultTypeContext, setResultTypeContext] = useState<ContextType | null>(null);
@@ -207,49 +209,65 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
-    if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
-    } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
-    } else {
-      if (targetApp && targetApp != 'None') {
-        try {
-          const targetObj = JSON.parse(targetApp);
-          let target = targetObj as AppMetadata;
+    setIsRaisingIntent(true);
+    
+    try {
+      if (!intentValue) {
+        setRaiseIntentError('Enter intent name');
+        return;
+      } else if (!raiseIntentContext) {
+        setRaiseIntentError('Select a context first');
+        return;
+      } else {
+        if (targetApp && targetApp != 'None') {
+          try {
+            const targetObj = JSON.parse(targetApp);
+            let target = targetObj as AppMetadata;
 
-          setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext, target));
-          setRaiseIntentError('');
-          return;
-        } catch (e) {
-          console.error('Error passing raiseIntent target option value!', contextTargetApp, e);
-          setTargetApp('None');
+            setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext, target));
+            setRaiseIntentError('');
+            return;
+          } catch (e) {
+            console.error('Error passing raiseIntent target option value!', contextTargetApp, e);
+            setTargetApp('None');
+          }
         }
+        setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext));
+        setRaiseIntentError('');
       }
-      //allow failover to raise without target if we were unable to parse it
-      setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext));
-      setRaiseIntentError('');
+    } catch (error) {
+      setRaiseIntentError(`Failed to raise intent: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsRaisingIntent(false);
     }
   };
 
   const handleRaiseIntentForContext = async () => {
     setIntentForContextResolution(null);
-    if (!raiseIntentWithContextContext) {
-      return;
-    }
-    if (contextTargetApp && contextTargetApp != 'None') {
-      try {
-        const targetObj = JSON.parse(contextTargetApp);
-        let target = targetObj as AppMetadata;
-
-        setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext, target));
+    setIsRaisingIntentForContext(true);
+    
+    try {
+      if (!raiseIntentWithContextContext) {
         return;
-      } catch (e) {
-        console.error('Error passing raiseIntentForContext target option value!', contextTargetApp, e);
-        setContextTargetApp('None');
       }
+      if (contextTargetApp && contextTargetApp != 'None') {
+        try {
+          const targetObj = JSON.parse(contextTargetApp);
+          let target = targetObj as AppMetadata;
+
+          setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext, target));
+          return;
+        } catch (e) {
+          console.error('Error passing raiseIntentForContext target option value!', contextTargetApp, e);
+          setContextTargetApp('None');
+        }
+      }
+      setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext));
+    } catch (error) {
+      console.error('Failed to raise intent for context:', error);
+    } finally {
+      setIsRaisingIntentForContext(false);
     }
-    //allow failover to raise without target if we were unable to parse it
-    setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext));
   };
 
   const clearTargets = () => {
@@ -655,8 +673,13 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
-                Raise intent
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={handleRaiseIntent} 
+                disabled={!intentValue || isRaisingIntent}
+              >
+                {isRaisingIntent ? 'Raising Intent...' : 'Raise intent'}
               </Button>
 
               <Tooltip title="Copy code example" aria-label="Copy code example">
@@ -754,12 +777,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
             </Grid>
             <Grid item className={classes.controls}>
               <Button
-                disabled={!raiseIntentWithContextContext}
+                disabled={!raiseIntentWithContextContext || isRaisingIntentForContext}
                 variant="contained"
                 color="primary"
                 onClick={handleRaiseIntentForContext}
               >
-                Raise intent for context
+                {isRaisingIntentForContext ? 'Raising Intent...' : 'Raise intent for context'}
               </Button>
 
               <Tooltip title="Copy code example" aria-label="Copy code example">
