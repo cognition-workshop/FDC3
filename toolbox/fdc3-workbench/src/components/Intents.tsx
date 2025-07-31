@@ -210,7 +210,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     if (!intentValue) {
       setRaiseIntentError('Enter intent name');
     } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+      setRaiseIntentError('Select a context first. Use "fdc3.nothing" context type if your intent doesn\'t require specific context data.');
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -318,7 +318,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
       if (!intentValue) {
         setRaiseIntentError('Enter intent name');
       } else if (!raiseIntentContext) {
-        setRaiseIntentError('Select a context first');
+        setRaiseIntentError('Select a context first. Use "fdc3.nothing" context type if your intent doesn\'t require specific context data.');
       } else {
         const intentTargetOptions: IntentTargetOption[] = await getTargetOptions(
           intentValue.value,
@@ -600,14 +600,15 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 options={intentsForContext || intentListenersOptions}
                 getOptionLabel={getOptionLabel}
                 renderOption={option => option.title}
+                disabled={!raiseIntentContext}
                 renderInput={params => (
                   <TemplateTextField
                     label="INTENT TYPE"
-                    placeholder="Enter Intent Type"
+                    placeholder={raiseIntentContext ? "Enter Intent Type" : "Select a context first"}
                     variant="outlined"
                     {...params}
                     error={!!raiseIntentError}
-                    helperText={raiseIntentError}
+                    helperText={raiseIntentError || (!raiseIntentContext ? "Choose a context to see available intents" : "")}
                   />
                 )}
               />
