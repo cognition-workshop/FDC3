@@ -208,9 +208,9 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
     if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
+      setRaiseIntentError('Please enter an intent name to proceed');
     } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+      setRaiseIntentError('Please select a context. Use "fdc3.nothing" if no specific context is needed');
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -655,7 +655,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue || !raiseIntentContext}>
                 Raise intent
               </Button>
 
