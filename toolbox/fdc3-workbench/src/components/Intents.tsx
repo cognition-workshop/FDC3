@@ -655,7 +655,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue || !raiseIntentContext}>
                 Raise intent
               </Button>
 
