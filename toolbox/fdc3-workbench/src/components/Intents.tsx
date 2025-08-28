@@ -600,14 +600,15 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 options={intentsForContext || intentListenersOptions}
                 getOptionLabel={getOptionLabel}
                 renderOption={option => option.title}
+                disabled={!raiseIntentContext}
                 renderInput={params => (
                   <TemplateTextField
                     label="INTENT TYPE"
-                    placeholder="Enter Intent Type"
+                    placeholder={raiseIntentContext ? "Enter Intent Type" : "Select a context first"}
                     variant="outlined"
                     {...params}
                     error={!!raiseIntentError}
-                    helperText={raiseIntentError}
+                    helperText={raiseIntentError || (!raiseIntentContext ? "Please select a context before choosing an intent" : "")}
                   />
                 )}
               />
@@ -619,7 +620,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                         checked={useTargets}
                         onChange={handleTargetToggle}
                         color="primary"
-                        disabled={!intentValue}
+                        disabled={!intentValue || !raiseIntentContext}
                       />
                     }
                     label="Select Target"
@@ -655,7 +656,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue || !raiseIntentContext}>
                 Raise intent
               </Button>
 
