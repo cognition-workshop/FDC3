@@ -212,22 +212,34 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     } else if (!raiseIntentContext) {
       setRaiseIntentError('Select a context first');
     } else {
-      if (targetApp && targetApp != 'None') {
-        try {
-          const targetObj = JSON.parse(targetApp);
-          let target = targetObj as AppMetadata;
+      try {
+        if (targetApp && targetApp != 'None') {
+          try {
+            const targetObj = JSON.parse(targetApp);
+            let target = targetObj as AppMetadata;
 
-          setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext, target));
-          setRaiseIntentError('');
-          return;
-        } catch (e) {
-          console.error('Error passing raiseIntent target option value!', contextTargetApp, e);
-          setTargetApp('None');
+            setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext, target));
+            setRaiseIntentError('');
+            return;
+          } catch (e) {
+            console.error('Error passing raiseIntent target option value!', contextTargetApp, e);
+            setTargetApp('None');
+          }
+        }
+        //allow failover to raise without target if we were unable to parse it
+        setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext));
+        setRaiseIntentError('');
+      } catch (error: any) {
+        if (error.message && error.message.includes('NoAppsFound')) {
+          setRaiseIntentError(
+            'No applications are available to handle this intent. Please ensure compatible apps are running.'
+          );
+        } else if (error.message && error.message.includes('ResolverUnavailable')) {
+          setRaiseIntentError('Intent resolver is unavailable. Please check your FDC3 desktop agent configuration.');
+        } else {
+          setRaiseIntentError(`Failed to raise intent: ${error.message || 'Unknown error occurred'}`);
         }
       }
-      //allow failover to raise without target if we were unable to parse it
-      setIntentResolution(await intentStore.raiseIntent(intentValue.value, raiseIntentContext));
-      setRaiseIntentError('');
     }
   };
 
@@ -236,20 +248,24 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     if (!raiseIntentWithContextContext) {
       return;
     }
-    if (contextTargetApp && contextTargetApp != 'None') {
-      try {
-        const targetObj = JSON.parse(contextTargetApp);
-        let target = targetObj as AppMetadata;
+    try {
+      if (contextTargetApp && contextTargetApp != 'None') {
+        try {
+          const targetObj = JSON.parse(contextTargetApp);
+          let target = targetObj as AppMetadata;
 
-        setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext, target));
-        return;
-      } catch (e) {
-        console.error('Error passing raiseIntentForContext target option value!', contextTargetApp, e);
-        setContextTargetApp('None');
+          setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext, target));
+          return;
+        } catch (e) {
+          console.error('Error passing raiseIntentForContext target option value!', contextTargetApp, e);
+          setContextTargetApp('None');
+        }
       }
+      //allow failover to raise without target if we were unable to parse it
+      setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext));
+    } catch (error: any) {
+      console.error('Failed to raise intent for context:', error);
     }
-    //allow failover to raise without target if we were unable to parse it
-    setIntentForContextResolution(await intentStore.raiseIntentForContext(raiseIntentWithContextContext));
   };
 
   const clearTargets = () => {
@@ -594,6 +610,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 blurOnSelect
                 clearOnBlur
                 handleHomeEndKeys
+                disabled={!raiseIntentContext}
                 value={intentValue}
                 onChange={handleChangeListener(setIntentValue, setRaiseIntentError)}
                 filterOptions={filterOptions}
@@ -603,11 +620,14 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 renderInput={params => (
                   <TemplateTextField
                     label="INTENT TYPE"
-                    placeholder="Enter Intent Type"
+                    placeholder={raiseIntentContext ? 'Enter Intent Type' : 'Select context first'}
                     variant="outlined"
                     {...params}
                     error={!!raiseIntentError}
-                    helperText={raiseIntentError}
+                    helperText={
+                      raiseIntentError ||
+                      (!raiseIntentContext ? 'Please select a context before choosing an intent' : '')
+                    }
                   />
                 )}
               />
@@ -619,7 +639,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                         checked={useTargets}
                         onChange={handleTargetToggle}
                         color="primary"
-                        disabled={!intentValue}
+                        disabled={!intentValue || !raiseIntentContext}
                       />
                     }
                     label="Select Target"
@@ -655,7 +675,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleRaiseIntent}
+                disabled={!intentValue || !raiseIntentContext}
+              >
                 Raise intent
               </Button>
 
