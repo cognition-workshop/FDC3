@@ -2,8 +2,10 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright FINOS FDC3 contributors - see NOTICE file
  */
-import * as fdc3_2 from '@finos/fdc3';
+import * as fdc3_2 from '../../../../packages/fdc3-standard/src/index';
 import * as fdc3_1 from 'fdc3-1.2';
+import { Context as fdc3_2Context } from '../../../../packages/fdc3-context/src/index';
+import { getAgent } from '@finos/fdc3-get-agent';
 
 interface fdc3_1IntentResolution extends fdc3_1.IntentResolution {
   getResult?: any;
@@ -52,7 +54,11 @@ export type AppMetadata = fdc3_2.AppMetadata;
 
 export type AppIntent = fdc3_1.AppIntent | fdc3_2.AppIntent;
 
-export type Context = fdc3_1.Context | fdc3_2.Context;
+export type Context = fdc3_1.Context | fdc3_2Context;
+
+export type Channel = fdc3_1.Channel | fdc3_2.Channel;
+
+export type IntentResult = fdc3_2.IntentResult;
 
 // export type AppIdentifier = fdc3_1.AppMetadata | fdc3_2.AppIdentifier;
 
@@ -67,8 +73,14 @@ export type IntentTargetOption = {
 
 export type ContextTargetOption = { intent: string; targetOptions: IntentTargetOption[] };
 
+export function getWorkbenchAgent(): Promise<fdc3_2.DesktopAgent> {
+  return getAgent({
+    dontSetWindowFdc3: false,
+  });
+}
+
 export async function getTargetOptions(intent: string, context: ContextType): Promise<IntentTargetOption[]> {
-  const agent = await fdc3_2.getAgent();
+  const agent = await getWorkbenchAgent();
 
   let appIntent = await agent.findIntent(intent, context);
   if (!appIntent?.apps) {
@@ -78,7 +90,7 @@ export async function getTargetOptions(intent: string, context: ContextType): Pr
   const groupedApps: IntentTargetOption[] = [];
 
   if (window.fdc3Version === '2.0') {
-    (appIntent as fdc3_2.AppIntent).apps.forEach(currentApp => {
+    (appIntent as fdc3_2.AppIntent).apps.forEach((currentApp: any) => {
       let foundApp = groupedApps.find(app => app.appId === currentApp.appId);
       if (!foundApp) {
         //separate out the instanceId if present
@@ -124,7 +136,7 @@ export async function getTargetOptions(intent: string, context: ContextType): Pr
 }
 
 export async function getTargetOptionsForContext(context: ContextType): Promise<IntentTargetOption[]> {
-  const agent = await fdc3_2.getAgent();
+  const agent = await getWorkbenchAgent();
 
   let appIntents = await agent.findIntentsByContext(context);
   if (appIntents.length === 0) {
@@ -136,7 +148,7 @@ export async function getTargetOptionsForContext(context: ContextType): Promise<
 
   if (window.fdc3Version === '2.0') {
     (appIntents as fdc3_2.AppIntent[]).forEach(currentIntent => {
-      currentIntent.apps.forEach(currentApp => {
+      currentIntent.apps.forEach((currentApp: any) => {
         let foundApp = groupedApps.find(app => app.appId === currentApp.appId);
         if (!foundApp) {
           //separate out the instanceId if present
@@ -169,7 +181,7 @@ export async function getTargetOptionsForContext(context: ContextType): Promise<
     });
   } else {
     (appIntents as fdc3_1.AppIntent[]).forEach(currentIntent => {
-      currentIntent.apps.forEach(currentApp => {
+      currentIntent.apps.forEach((currentApp: any) => {
         //deduplicate in case a 2.0 implementation returned some instances
         let foundApp = groupedApps.find(app => app.appId === currentApp.appId);
         if (!foundApp) {

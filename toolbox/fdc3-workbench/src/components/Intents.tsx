@@ -9,6 +9,7 @@ import {
   ContextType,
   getTargetOptions,
   getTargetOptionsForContext,
+  getWorkbenchAgent,
   IntentResolution,
   IntentTargetOption,
 } from '../utility/Fdc3Api';
@@ -48,7 +49,6 @@ import { FormControlLabel } from '@material-ui/core';
 import { RadioGroup } from '@material-ui/core';
 import { Alert, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import { getAgent } from '@finos/fdc3';
 
 // interface copied from lib @material-ui/lab/Autocomplete
 interface FilterOptionsState<T> {
@@ -207,10 +207,16 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
-    if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
-    } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+    if (!raiseIntentContext) {
+      setRaiseIntentError(
+        'Please select a context first. The context provides the data that will be shared with the target application when raising the intent.'
+      );
+      return;
+    } else if (!intentValue) {
+      setRaiseIntentError(
+        'Please select an intent. The intent defines what action you want the target application to perform with the provided context.'
+      );
+      return;
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -528,7 +534,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
           return;
         }
         setRaiseIntentError(false);
-        let appIntents = await getAgent().then(agent => agent.findIntentsByContext(toJS(raiseIntentContext)));
+        let appIntents = await getWorkbenchAgent().then(agent => agent.findIntentsByContext(toJS(raiseIntentContext)));
 
         setUseTargets(false);
         clearTargets();
@@ -655,7 +661,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleRaiseIntent}
+                disabled={!raiseIntentContext || !intentValue}
+              >
                 Raise intent
               </Button>
 
@@ -690,7 +701,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Link>
             </Grid>
           </Grid>
-          {intentResolution?.source && (
+          {intentResolution && 'source' in intentResolution && intentResolution.source && (
             <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
               <Grid item className={classes.textField}>
                 <IntentResolutionField data={intentResolution} handleTabChange={handleTabChange} />
@@ -791,18 +802,20 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Link>
             </Grid>
           </Grid>
-          {intentForContextResolution?.source && (
-            <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
-              <Grid item className={classes.textField}>
-                <IntentResolutionField data={intentForContextResolution} handleTabChange={handleTabChange} />
+          {intentForContextResolution &&
+            'source' in intentForContextResolution &&
+            intentForContextResolution.source && (
+              <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
+                <Grid item className={classes.textField}>
+                  <IntentResolutionField data={intentForContextResolution} handleTabChange={handleTabChange} />
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="secondary" onClick={() => setIntentForContextResolution(null)}>
+                    Clear result
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Button variant="contained" color="secondary" onClick={() => setIntentForContextResolution(null)}>
-                  Clear result
-                </Button>
-              </Grid>
-            </Grid>
-          )}
+            )}
           <div className={classes.border}></div>
 
           <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
