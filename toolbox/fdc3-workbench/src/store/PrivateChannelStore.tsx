@@ -122,7 +122,7 @@ class PrivateChannelStore {
         const listenerId = nanoid();
         const contactListener = await currentChannel.addContextListener(
           newListener?.toLowerCase() === 'all' ? null : newListener,
-          (context, metaData?: any) => {
+          (context: any, metaData?: any) => {
             const currentListener = this.channelListeners.find(
               listener => listener.type === newListener && listener.channelId === channelId
             );

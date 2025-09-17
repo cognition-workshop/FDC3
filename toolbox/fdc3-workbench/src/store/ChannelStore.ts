@@ -4,7 +4,7 @@
  */
 import { makeObservable, observable, action, runInAction } from 'mobx';
 import systemLogStore from './SystemLogStore';
-import { Channel } from '@finos/fdc3';
+import { Channel } from '../utility/Fdc3Api';
 import { getWorkbenchAgent } from '../utility/Fdc3Api';
 
 class ChannelStore {

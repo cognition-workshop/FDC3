@@ -16,7 +16,7 @@ import { intentTypes } from '../fixtures/intentTypes';
 import systemLogStore from './SystemLogStore';
 import appChannelStore from './AppChannelStore';
 import privateChannelStore from './PrivateChannelStore';
-import { Channel, IntentResult } from '@finos/fdc3';
+import { Channel, IntentResult } from '../utility/Fdc3Api';
 
 type IntentItem = { title: string; value: string };
 
@@ -98,7 +98,7 @@ class IntentStore {
             body: JSON.stringify(context, null, 4),
           });
 
-          const result: IntentResult = channel || (resultContext ?? undefined);
+          const result: IntentResult = channel || (resultContext as any);
 
           return result;
         }
