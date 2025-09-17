@@ -207,10 +207,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
-    if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
-    } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+    if (!raiseIntentContext) {
+      setRaiseIntentError('Please select a context first. The context provides the data that will be shared with the target application when raising the intent.');
+      return;
+    } else if (!intentValue) {
+      setRaiseIntentError('Please select an intent. The intent defines what action you want the target application to perform with the provided context.');
+      return;
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -655,7 +657,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!raiseIntentContext || !intentValue}>
                 Raise intent
               </Button>
 
