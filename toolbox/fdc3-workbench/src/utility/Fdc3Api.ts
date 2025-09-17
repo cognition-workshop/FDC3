@@ -5,7 +5,7 @@
 import * as fdc3_2 from '../../../../packages/fdc3-standard/src/index';
 import * as fdc3_1 from 'fdc3-1.2';
 import { Context as fdc3_2Context } from '../../../../packages/fdc3-context/src/index';
-import { getAgent } from '../../../../packages/fdc3-get-agent/src/index';
+import { getAgent } from '@finos/fdc3-get-agent';
 
 interface fdc3_1IntentResolution extends fdc3_1.IntentResolution {
   getResult?: any;
