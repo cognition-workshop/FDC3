@@ -7,11 +7,6 @@ assignees: ''
 
 ---
 
----
-name: 🤝FDC3 Standard WG Meeting Minutes
-about: Track Standard Working Group meeting agenda and attendance
----
-
 ## Date
 Thursday DD MMM yyyy - 10am (US eastern timezone EDT/EST) / 3pm (London, GMT/BST)
 

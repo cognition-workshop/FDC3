@@ -209,8 +209,10 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     setIntentResolution(null);
     if (!intentValue) {
       setRaiseIntentError('Enter intent name');
+      return;
     } else if (!raiseIntentContext) {
       setRaiseIntentError('Select a context first');
+      return;
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -586,6 +588,11 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
           <Grid container item spacing={2} justifyContent="flex-end" className={classes.spread}>
             <Grid item className={classes.field}>
               <ContextTemplates handleTabChange={handleTabChange} contextStateSetter={setRaiseIntentContext} />
+              {!raiseIntentContext && (
+                <Typography variant="caption" color="textSecondary" style={{ marginTop: '4px', display: 'block' }}>
+                  Please select a context to enable intent raising
+                </Typography>
+              )}
               <Autocomplete
                 className={classes.rightPadding}
                 id="raise-intent"
@@ -655,7 +662,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue || !raiseIntentContext}>
                 Raise intent
               </Button>
 

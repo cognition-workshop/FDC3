@@ -7,11 +7,6 @@ assignees: ''
 
 ---
 
----
-name: 🤝FDC3 General Meeting Minutes
-about: Track FDC3 General meeting agenda and attendance
----
-
 ## Date
 DD MMM yyyy - 10am EST / 3pm GMT
 
