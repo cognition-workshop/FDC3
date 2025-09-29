@@ -9,6 +9,7 @@ import {
   ContextType,
   getTargetOptions,
   getTargetOptionsForContext,
+  getWorkbenchAgent,
   IntentResolution,
   IntentTargetOption,
 } from '../utility/Fdc3Api';
@@ -48,7 +49,6 @@ import { FormControlLabel } from '@material-ui/core';
 import { RadioGroup } from '@material-ui/core';
 import { Alert, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import { getAgent } from '@finos/fdc3';
 
 // interface copied from lib @material-ui/lab/Autocomplete
 interface FilterOptionsState<T> {
@@ -207,10 +207,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
 
   const handleRaiseIntent = async () => {
     setIntentResolution(null);
-    if (!intentValue) {
-      setRaiseIntentError('Enter intent name');
-    } else if (!raiseIntentContext) {
-      setRaiseIntentError('Select a context first');
+    if (!raiseIntentContext) {
+      setRaiseIntentError('Please select a context first to enable intent selection');
+      return;
+    } else if (!intentValue) {
+      setRaiseIntentError('Please select an intent from the available options');
+      return;
     } else {
       if (targetApp && targetApp != 'None') {
         try {
@@ -315,10 +317,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
 
   const handleTargetMenuOpen = () => {
     const fetchAppsAndInstances = async () => {
-      if (!intentValue) {
-        setRaiseIntentError('Enter intent name');
-      } else if (!raiseIntentContext) {
-        setRaiseIntentError('Select a context first');
+      if (!raiseIntentContext) {
+        setRaiseIntentError('Please select a context first to enable intent selection');
+        return;
+      } else if (!intentValue) {
+        setRaiseIntentError('Please select an intent from the available options');
+        return;
       } else {
         const intentTargetOptions: IntentTargetOption[] = await getTargetOptions(
           intentValue.value,
@@ -525,10 +529,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
     const fetchIntents = async () => {
       try {
         if (!raiseIntentContext) {
+          setIntentsForContext(null);
+          setRaiseIntentError(false);
           return;
         }
         setRaiseIntentError(false);
-        let appIntents = await getAgent().then(agent => agent.findIntentsByContext(toJS(raiseIntentContext)));
+        let appIntents = await getWorkbenchAgent().then(agent => agent.findIntentsByContext(toJS(raiseIntentContext)));
 
         setUseTargets(false);
         clearTargets();
@@ -542,10 +548,13 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               };
             })
           );
+        } else {
+          setIntentsForContext([]);
+          setRaiseIntentError('No intents available for the selected context');
         }
       } catch (e) {
         setIntentsForContext([]);
-        setRaiseIntentError('no intents found');
+        setRaiseIntentError('Error finding intents for the selected context');
       }
     };
     fetchIntents();
@@ -600,14 +609,15 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                 options={intentsForContext || intentListenersOptions}
                 getOptionLabel={getOptionLabel}
                 renderOption={option => option.title}
+                disabled={!raiseIntentContext}
                 renderInput={params => (
                   <TemplateTextField
                     label="INTENT TYPE"
-                    placeholder="Enter Intent Type"
+                    placeholder={raiseIntentContext ? "Select an intent for the context" : "Select a context first"}
                     variant="outlined"
                     {...params}
                     error={!!raiseIntentError}
-                    helperText={raiseIntentError}
+                    helperText={raiseIntentError || (!raiseIntentContext ? "Context selection is required before choosing an intent" : "")}
                   />
                 )}
               />
@@ -619,7 +629,7 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
                         checked={useTargets}
                         onChange={handleTargetToggle}
                         color="primary"
-                        disabled={!intentValue}
+                        disabled={!intentValue || !raiseIntentContext}
                       />
                     }
                     label="Select Target"
@@ -655,7 +665,12 @@ export const Intents = observer(({ handleTabChange }: { handleTabChange: any }) 
               </Grid>
             </Grid>
             <Grid item className={classes.controls}>
-              <Button variant="contained" color="primary" onClick={handleRaiseIntent} disabled={!intentValue}>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={handleRaiseIntent} 
+                disabled={!intentValue || !raiseIntentContext}
+              >
                 Raise intent
               </Button>
 
