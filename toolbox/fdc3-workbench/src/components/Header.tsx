@@ -118,6 +118,9 @@ export const Header = (props: { fdc3Available: boolean }) => {
         } else if (implInfo?.fdc3Version && implInfo.fdc3Version == '2.1') {
           //API version 2.1 is backwards compatible with 2.0
           setChosenVersion('2.0');
+        } else if (implInfo?.fdc3Version && implInfo.fdc3Version == '2.2') {
+          //API version 2.2 is backwards compatible with 2.0
+          setChosenVersion('2.0');
         } else if (implInfo?.fdc3Version && supportedVersion.includes(implInfo.fdc3Version)) {
           setChosenVersion(implInfo.fdc3Version);
         } else {
@@ -167,7 +170,8 @@ export const Header = (props: { fdc3Available: boolean }) => {
                   <th scope="row">FDC3 Version</th>
                   {appInfo?.fdc3Version ? (
                     chosenVersion === appInfo.fdc3Version ||
-                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.1') ? (
+                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.1') ||
+                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.2') ? (
                       <td>{appInfo.fdc3Version}</td>
                     ) : (
                       <td className={classes.warningText}>

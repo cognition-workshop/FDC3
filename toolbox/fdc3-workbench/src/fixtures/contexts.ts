@@ -174,6 +174,7 @@ export const contexts: ContextItem[] = [
     id: 'ContactList example',
     template: {
       type: 'fdc3.contactList',
+      name: 'Contact List',
       contacts: [
         {
           type: 'fdc3.contact',
@@ -265,15 +266,18 @@ export const contexts: ContextItem[] = [
     id: 'InstrumentList example',
     template: {
       type: 'fdc3.instrumentList',
+      name: 'Instrument List',
       instruments: [
         {
           type: 'fdc3.instrument',
+          name: 'Apple Inc.',
           id: {
             ticker: 'AAPL',
           },
         },
         {
           type: 'fdc3.instrument',
+          name: 'Microsoft Corporation',
           id: {
             ticker: 'MSFT',
           },
@@ -376,8 +380,10 @@ export const contexts: ContextItem[] = [
     id: 'Position example',
     template: {
       type: 'fdc3.position',
+      name: 'AAPL Position',
       instrument: {
         type: 'fdc3.instrument',
+        name: 'Apple Inc.',
         id: {
           ticker: 'AAPL',
         },
@@ -391,11 +397,14 @@ export const contexts: ContextItem[] = [
     id: 'Portfolio example',
     template: {
       type: 'fdc3.portfolio',
+      name: 'Sample Portfolio',
       positions: [
         {
           type: 'fdc3.position',
+          name: 'AAPL Position',
           instrument: {
             type: 'fdc3.instrument',
+            name: 'Apple Inc.',
             id: {
               ticker: 'AAPL',
             },
@@ -404,8 +413,10 @@ export const contexts: ContextItem[] = [
         },
         {
           type: 'fdc3.position',
+          name: 'MSFT Position',
           instrument: {
             type: 'fdc3.instrument',
+            name: 'Microsoft Corporation',
             id: {
               ticker: 'MSFT',
             },
@@ -414,8 +425,10 @@ export const contexts: ContextItem[] = [
         },
         {
           type: 'fdc3.position',
+          name: 'IBM Position',
           instrument: {
             type: 'fdc3.instrument',
+            name: 'International Business Machines Corporation',
             id: {
               ticker: 'IBM',
             },
