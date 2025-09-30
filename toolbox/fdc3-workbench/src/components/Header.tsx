@@ -7,8 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AppBar, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import WarningIcon from '@material-ui/icons/Warning';
-import { getAgent } from '@finos/fdc3';
-import { ImplementationMetadata } from '../utility/Fdc3Api';
+import { getWorkbenchAgent, ImplementationMetadata } from '../utility/Fdc3Api';
 
 declare global {
   interface Window {
@@ -88,7 +87,7 @@ export const Header = (props: { fdc3Available: boolean }) => {
 
         //Then if chosenVersion == "2.0"  then implInfo = await implInfoPromise   else implInfo = implInfoPromise  (with handling for <1.2 where getInfo() doesn't exist at all.
         try {
-          const implInfoPromise = getAgent().then(agent => agent.getInfo());
+          const implInfoPromise = getWorkbenchAgent().then(agent => agent.getInfo());
           if (paramVersion == '1.2' && (implInfoPromise as unknown as ImplementationMetadata).fdc3Version) {
             //should not expect a promise if we're really working with 1.2
             implInfo = implInfoPromise as unknown as ImplementationMetadata;
@@ -118,6 +117,9 @@ export const Header = (props: { fdc3Available: boolean }) => {
           setChosenVersion(paramVersion);
         } else if (implInfo?.fdc3Version && implInfo.fdc3Version == '2.1') {
           //API version 2.1 is backwards compatible with 2.0
+          setChosenVersion('2.0');
+        } else if (implInfo?.fdc3Version && implInfo.fdc3Version == '2.2') {
+          //API version 2.2 is backwards compatible with 2.0
           setChosenVersion('2.0');
         } else if (implInfo?.fdc3Version && supportedVersion.includes(implInfo.fdc3Version)) {
           setChosenVersion(implInfo.fdc3Version);
@@ -168,7 +170,8 @@ export const Header = (props: { fdc3Available: boolean }) => {
                   <th scope="row">FDC3 Version</th>
                   {appInfo?.fdc3Version ? (
                     chosenVersion === appInfo.fdc3Version ||
-                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.1') ? (
+                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.1') ||
+                    (chosenVersion === '2.0' && appInfo.fdc3Version === '2.2') ? (
                       <td>{appInfo.fdc3Version}</td>
                     ) : (
                       <td className={classes.warningText}>
