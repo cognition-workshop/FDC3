@@ -83,29 +83,20 @@ export class DefaultFDC3Server extends BasicFDC3Server {
     ];
 
     if (heartbeats) {
-      let heartbeatConfig: HeartbeatConfig;
-      
-      if (typeof heartbeats === 'boolean') {
-        heartbeatConfig = {
-          pingInterval: openHandlerTimeoutMs / 10,
-          disconnectedAfter: openHandlerTimeoutMs / 2,
-          deadAfter: openHandlerTimeoutMs,
-        };
-      } else {
-        heartbeatConfig = {
-          pingInterval: heartbeats.pingInterval ?? 1000,
-          disconnectedAfter: heartbeats.disconnectedAfter ?? 5000,
-          deadAfter: heartbeats.deadAfter ?? 20000,
-        };
-      }
+      const { pingInterval, disconnectedAfter, deadAfter } =
+        typeof heartbeats === 'boolean'
+          ? {
+              pingInterval: openHandlerTimeoutMs / 10,
+              disconnectedAfter: openHandlerTimeoutMs / 2,
+              deadAfter: openHandlerTimeoutMs,
+            }
+          : {
+              pingInterval: heartbeats.pingInterval ?? 1000,
+              disconnectedAfter: heartbeats.disconnectedAfter ?? 5000,
+              deadAfter: heartbeats.deadAfter ?? 20000,
+            };
 
-      handlers.push(
-        new HeartbeatHandler(
-          heartbeatConfig.pingInterval,
-          heartbeatConfig.disconnectedAfter,
-          heartbeatConfig.deadAfter
-        )
-      );
+      handlers.push(new HeartbeatHandler(pingInterval, disconnectedAfter, deadAfter));
     }
 
     super(handlers, sc);
