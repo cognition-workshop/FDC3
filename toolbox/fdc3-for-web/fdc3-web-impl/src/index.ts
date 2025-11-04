@@ -1,5 +1,5 @@
 import { ServerContext, InstanceID, State, AppRegistration } from './ServerContext';
-import { BasicFDC3Server, DefaultFDC3Server } from './BasicFDC3Server';
+import { BasicFDC3Server, DefaultFDC3Server, HeartbeatConfig } from './BasicFDC3Server';
 import { FDC3Server } from './FDC3Server';
 import { Directory, DirectoryApp, DirectoryIntent, WebAppDetails } from './directory/DirectoryInterface';
 import { BasicDirectory } from './directory/BasicDirectory';
@@ -14,6 +14,7 @@ export {
   type AppRegistration,
   BasicFDC3Server,
   DefaultFDC3Server,
+  type HeartbeatConfig,
   type FDC3Server,
   type Directory,
   BasicDirectory,
