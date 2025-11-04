@@ -141,6 +141,7 @@ window.addEventListener('load', () => {
         },
       },
     ];
+    
     const fdc3Server = new DefaultFDC3Server(sc, directory, channelDetails, true, 20000, 10017);
 
     socket.on(FDC3_APP_EVENT, (msg, from) => {
