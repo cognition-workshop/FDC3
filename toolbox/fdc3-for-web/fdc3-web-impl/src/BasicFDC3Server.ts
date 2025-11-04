@@ -11,6 +11,12 @@ import {
   WebConnectionProtocol6Goodbye,
 } from '@finos/fdc3-schema/dist/generated/api/BrowserTypes';
 
+export interface HeartbeatConfig {
+  pingInterval?: number;
+  disconnectedAfter?: number;
+  deadAfter?: number;
+}
+
 export interface MessageHandler {
   /**
    * Handles an AgentRequestMessage from the messaging source. This function
@@ -66,7 +72,7 @@ export class DefaultFDC3Server extends BasicFDC3Server {
     sc: ServerContext<AppRegistration>,
     directory: Directory,
     userChannels: ChannelState[],
-    heartbeats: boolean,
+    heartbeats: boolean | HeartbeatConfig,
     intentTimeoutMs: number = 20000,
     openHandlerTimeoutMs: number = 10000
   ) {
@@ -77,7 +83,20 @@ export class DefaultFDC3Server extends BasicFDC3Server {
     ];
 
     if (heartbeats) {
-      handlers.push(new HeartbeatHandler(openHandlerTimeoutMs / 10, openHandlerTimeoutMs / 2, openHandlerTimeoutMs));
+      const { pingInterval, disconnectedAfter, deadAfter } =
+        typeof heartbeats === 'boolean'
+          ? {
+              pingInterval: openHandlerTimeoutMs / 10,
+              disconnectedAfter: openHandlerTimeoutMs / 2,
+              deadAfter: openHandlerTimeoutMs,
+            }
+          : {
+              pingInterval: heartbeats.pingInterval ?? 1000,
+              disconnectedAfter: heartbeats.disconnectedAfter ?? 5000,
+              deadAfter: heartbeats.deadAfter ?? 20000,
+            };
+
+      handlers.push(new HeartbeatHandler(pingInterval, disconnectedAfter, deadAfter));
     }
 
     super(handlers, sc);
